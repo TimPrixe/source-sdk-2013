@@ -24,6 +24,7 @@
 #define	SF_FIRE_NO_GLOW				0x00000020
 #define SF_FIRE_DIE_PERMANENT		0x00000080
 #define SF_FIRE_VISIBLE_FROM_ABOVE	0x00000100
+#define SF_FIRE_EMIT_SOUND		0x00000200 // VXP
 
 //==================================================
 // CFire

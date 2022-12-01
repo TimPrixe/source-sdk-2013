@@ -64,10 +64,10 @@ const char *g_pJeepThinkContext = "JeepSeagullThink";
 #define JEEP_SEAGULL_HIDDEN_TIME		15.0		// Time for which the player must be hidden from the jeep for a seagull to perch
 #define JEEP_SEAGULL_MAX_TIME			60.0		// Time at which a seagull will definately perch on the jeep
 
-ConVar	sk_jeep_gauss_damage( "sk_jeep_gauss_damage", "15" );
 ConVar	hud_jeephint_numentries( "hud_jeephint_numentries", "10", FCVAR_NONE );
 ConVar	g_jeepexitspeed( "g_jeepexitspeed", "100", FCVAR_CHEAT );
 
+extern ConVar sk_jeep_gauss_damage;
 extern ConVar autoaim_max_dist;
 extern ConVar sv_vehicle_autoaim_scale;
 

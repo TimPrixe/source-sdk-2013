@@ -3097,19 +3097,19 @@ void CNPC_MetroPolice::Event_Killed( const CTakeDamageInfo &info )
 		m_hManhack = NULL;
 	}
 
-	CBasePlayer *pPlayer = ToBasePlayer( info.GetAttacker() );
+//	CBasePlayer *pPlayer = ToBasePlayer( info.GetAttacker() );
 
-	if ( pPlayer != NULL )
-	{
-		CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
+//	if ( pPlayer != NULL )
+//	{
+//		CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
 
 		// Attempt to drop health
-		if ( pHL2GameRules->NPC_ShouldDropHealth( pPlayer ) )
-		{
-			DropItem( "item_healthvial", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
-			pHL2GameRules->NPC_DroppedHealth();
-		}
-	}
+//		if ( pHL2GameRules->NPC_ShouldDropHealth( pPlayer ) )
+//		{
+//			DropItem( "item_healthvial", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
+//			pHL2GameRules->NPC_DroppedHealth();
+//		}
+//	}
 
 	BaseClass::Event_Killed( info );
 }
@@ -4955,7 +4955,7 @@ WeaponProficiency_t CNPC_MetroPolice::CalcWeaponProficiency( CBaseCombatWeapon *
 {
 	if( FClassnameIs( pWeapon, "weapon_pistol" ) )
 	{
-		return WEAPON_PROFICIENCY_POOR;
+		return WEAPON_PROFICIENCY_AVERAGE;
 	}
 
 	if( FClassnameIs( pWeapon, "weapon_smg1" ) )

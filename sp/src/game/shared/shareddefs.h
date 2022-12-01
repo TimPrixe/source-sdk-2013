@@ -298,7 +298,7 @@ enum CastVote
 // Muzzle flash definitions (for the flags field of the "MuzzleFlash" DispatchEffect)
 enum
 {
-	MUZZLEFLASH_AR2				= 0,
+	MUZZLEFLASH_AR2 = 0,
 	MUZZLEFLASH_SHOTGUN,
 	MUZZLEFLASH_SMG1,
 	MUZZLEFLASH_SMG2,

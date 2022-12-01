@@ -14,7 +14,7 @@
 #include "hud.h"
 #include "hudelement.h"
 #include "hud_macros.h"
-#include "hud_numericdisplay.h"
+#include "hud_bitmapnumericdisplay.h"
 #include "iclientmode.h"
 
 #include "vgui_controls/AnimationController.h"
@@ -28,9 +28,9 @@
 //-----------------------------------------------------------------------------
 // Purpose: Displays suit power (armor) on hud
 //-----------------------------------------------------------------------------
-class CHudBattery : public CHudNumericDisplay, public CHudElement
+class CHudBattery : public CHudBitmapNumericDisplay, public CHudElement
 {
-	DECLARE_CLASS_SIMPLE( CHudBattery, CHudNumericDisplay );
+	DECLARE_CLASS_SIMPLE(CHudBattery, CHudBitmapNumericDisplay);
 
 public:
 	CHudBattery( const char *pElementName );
@@ -40,10 +40,12 @@ public:
 	void OnThink( void );
 	void MsgFunc_Battery(bf_read &msg );
 	bool ShouldDraw();
-	
+
 private:
 	int		m_iBat;	
 	int		m_iNewBat;
+	float	m_fFade;
+	int		m_iGhostBat;
 };
 
 DECLARE_HUDELEMENT( CHudBattery );
@@ -73,8 +75,13 @@ void CHudBattery::Init( void )
 //-----------------------------------------------------------------------------
 void CHudBattery::Reset( void )
 {
-	SetLabelText(g_pVGuiLocalize->Find("#Valve_Hud_SUIT"));
+	//SetLabelText(g_pVGuiLocalize->Find("#Valve_Hud_SUIT"));
+	m_iGhostBat = 0;
+	m_fFade = 0;
 	SetDisplayValue(m_iBat);
+	SetLabelText(L"SUIT");
+
+	SetPaintBackgroundEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -102,12 +109,14 @@ bool CHudBattery::ShouldDraw( void )
 //-----------------------------------------------------------------------------
 void CHudBattery::OnThink( void )
 {
+	SetPaintEnabled(true);
+
 	if ( m_iBat == m_iNewBat )
 		return;
 
 	if ( !m_iNewBat )
 	{
-	 	g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("SuitPowerZero");
+		//g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("SuitPowerZero");
 	}
 	else if ( m_iNewBat < m_iBat )
 	{
@@ -133,6 +142,8 @@ void CHudBattery::OnThink( void )
 		}
 	}
 
+	m_fFade = 200;
+	m_iGhostBat = m_iNewBat;
 	m_iBat = m_iNewBat;
 
 	SetDisplayValue(m_iBat);

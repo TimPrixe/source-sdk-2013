@@ -136,7 +136,11 @@ public:
 	float						GetFOVSensitivityAdjust();
 
 	void						DrawProgressBar( int x, int y, int width, int height, float percentage, Color& clr, unsigned char type );
-	void						DrawIconProgressBar( int x, int y, CHudTexture *icon, CHudTexture *icon2, float percentage, Color& clr, int type );
+	void						DrawIconProgressBar(int x, int y, int width, int height, CHudTexture *icon, float percentage, Color& clr, int type); // VXP
+	void						DrawIconProgressBar(int x, int y, CHudTexture *icon, float percentage, Color& clr, int type)
+	{
+		DrawIconProgressBar(x, y, icon->Width(), icon->Height(), icon, percentage, clr, type);
+	}
 
 	CHudTexture					*GetIcon( const char *szIcon );
 
@@ -198,6 +202,7 @@ extern CHud gHUD;
 // Global fonts used in the client DLL
 //-----------------------------------------------------------------------------
 extern vgui::HFont g_hFontTrebuchet24;
+extern vgui::HFont g_hFontTrebuchet40;
 
 void LoadHudTextures( CUtlDict< CHudTexture *, int >& list, const char *szFilenameWithoutExtension, const unsigned char *pICEKey );
 

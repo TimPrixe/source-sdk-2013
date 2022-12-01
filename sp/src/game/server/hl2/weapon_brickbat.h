@@ -21,6 +21,9 @@ enum BrickbatAmmo_t
 {
 	BRICKBAT_ROCK = 0,
 	BRICKBAT_BOTTLE,
+	BRICKBAT_HEADCRAB,
+	BRICKBAT_CREMATORHEAD,
+
 	
 	NUM_BRICKBAT_AMMO_TYPES
 };
@@ -41,8 +44,8 @@ public:
 	void				Spawn( void );
 	bool				Deploy( void );
 
-	virtual const char *GetViewModel( int viewmodelindex =0 );
-	virtual const char *GetWorldModel( void );
+	virtual const char *GetViewModel(int viewmodelindex = 0) const;
+	virtual const char *GetWorldModel(void) const;
 
 	void				DrawAmmo( void );
 

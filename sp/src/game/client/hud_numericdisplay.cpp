@@ -1,8 +1,8 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+//========= Copyright © 1996-2003, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
-//=============================================================================//
+//=============================================================================
 
 #include "cbase.h"
 #include "hud_numericdisplay.h"
@@ -14,9 +14,6 @@
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 
-// memdbgon must be the last include file in a .cpp file!!!
-#include "tier0/memdbgon.h"
-
 using namespace vgui;
 
 //-----------------------------------------------------------------------------
@@ -25,15 +22,13 @@ using namespace vgui;
 CHudNumericDisplay::CHudNumericDisplay(vgui::Panel *parent, const char *name) : BaseClass(parent, name)
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
-	SetParent( pParent );
+	SetParent(pParent);
 
 	m_iValue = 0;
 	m_LabelText[0] = 0;
 	m_iSecondaryValue = 0;
 	m_bDisplayValue = true;
 	m_bDisplaySecondaryValue = false;
-	m_bIndent = false;
-	m_bIsTime = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,74 +81,53 @@ void CHudNumericDisplay::SetLabelText(const wchar_t *text)
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: data accessor
-//-----------------------------------------------------------------------------
-void CHudNumericDisplay::SetIndent(bool state)
-{
-	m_bIndent = state;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: data accessor
-//-----------------------------------------------------------------------------
-void CHudNumericDisplay::SetIsTime(bool state)
-{
-	m_bIsTime = state;
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: paints a number at the specified position
 //-----------------------------------------------------------------------------
 void CHudNumericDisplay::PaintNumbers(HFont font, int xpos, int ypos, int value)
 {
 	surface()->DrawSetTextFont(font);
 	wchar_t unicode[6];
-	if ( !m_bIsTime )
-	{
-		V_snwprintf(unicode, ARRAYSIZE(unicode), L"%d", value);
-	}
-	else
-	{
-		int iMinutes = value / 60;
-		int iSeconds = value - iMinutes * 60;
-#ifdef PORTAL
-		// portal uses a normal font for numbers so we need the seperate to be a renderable ':' char
-		if ( iSeconds < 10 )
-			V_snwprintf( unicode, ARRAYSIZE(unicode), L"%d:0%d", iMinutes, iSeconds );
-		else
-			V_snwprintf( unicode, ARRAYSIZE(unicode), L"%d:%d", iMinutes, iSeconds );		
-#else
-		if ( iSeconds < 10 )
-			V_snwprintf( unicode, ARRAYSIZE(unicode), L"%d`0%d", iMinutes, iSeconds );
-		else
-			V_snwprintf( unicode, ARRAYSIZE(unicode), L"%d`%d", iMinutes, iSeconds );
-#endif
-	}
-
+	swprintf(unicode, L"%d", value);
 	// adjust the position to take into account 3 characters
 	int charWidth = surface()->GetCharacterWidth(font, '0');
-	if (value < 100 && m_bIndent)
+	if (value < 100)
 	{
 		xpos += charWidth;
 	}
-	if (value < 10 && m_bIndent)
+	if (value < 10)
 	{
 		xpos += charWidth;
 	}
 
 	surface()->DrawSetTextPos(xpos, ypos);
-	surface()->DrawUnicodeString( unicode );
+	for (wchar_t *ch = unicode; *ch != 0; ch++)
+	{
+		surface()->DrawUnicodeChar(*ch);
+	}
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: draws the text
 //-----------------------------------------------------------------------------
-void CHudNumericDisplay::PaintLabel( void )
+void CHudNumericDisplay::PaintLabel(void)
 {
 	surface()->DrawSetTextFont(m_hTextFont);
 	surface()->DrawSetTextColor(GetFgColor());
 	surface()->DrawSetTextPos(text_xpos, text_ypos);
-	surface()->DrawUnicodeString( m_LabelText );
+	surface()->DrawUnicodeString(m_LabelText);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CHudNumericDisplay::PaintBackground(void)
+{
+	int alpha = m_flAlphaOverride / 255;
+	Color bgColor = GetBgColor();
+	bgColor[3] *= alpha;
+	SetBgColor(bgColor);
+
+	BaseClass::PaintBackground();
 }
 
 //-----------------------------------------------------------------------------
@@ -161,6 +135,11 @@ void CHudNumericDisplay::PaintLabel( void )
 //-----------------------------------------------------------------------------
 void CHudNumericDisplay::Paint()
 {
+	float alpha = m_flAlphaOverride / 255;
+	Color fgColor = GetFgColor();
+	fgColor[3] *= alpha;
+	SetFgColor(fgColor);
+
 	if (m_bDisplayValue)
 	{
 		// draw our numbers
@@ -188,11 +167,23 @@ void CHudNumericDisplay::Paint()
 	// total ammo
 	if (m_bDisplaySecondaryValue)
 	{
-		surface()->DrawSetTextColor(GetFgColor());
+		//fgColor = m_Ammo2Color;
+		//fgColor[3] *= alpha;
+		surface()->DrawSetTextColor(fgColor);
 		PaintNumbers(m_hSmallNumberFont, digit2_xpos, digit2_ypos, m_iSecondaryValue);
 	}
 
-	PaintLabel();
+	// draw our name
+	//fgColor = m_TextColor;
+	//fgColor[3] *= alpha;
+
+	surface()->DrawSetTextFont(m_hTextFont);
+	surface()->DrawSetTextColor(fgColor);
+	surface()->DrawSetTextPos(text_xpos, text_ypos);
+	for (wchar_t *wch = m_LabelText; *wch != 0; wch++)
+	{
+		surface()->DrawUnicodeChar(*wch);
+	}
 }
 
 

@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose:		Things thrown from the hand 
 //
@@ -21,14 +21,16 @@ enum BrickbatAmmo_t;
 class CGrenade_Brickbat : public CBaseGrenade
 {
 public:
-	DECLARE_CLASS( CGrenade_Brickbat, CBaseGrenade );
+	DECLARE_CLASS(CGrenade_Brickbat, CBaseGrenade);
 
-	virtual void	Spawn( void );
-	virtual void	SpawnBrickbatWeapon( void );
-	virtual void	Detonate( void ) { return;};
+	virtual void	Spawn(void);
+	virtual void	SpawnBrickbatWeapon(void);
+	virtual void	Detonate(void) { return; };
 	virtual bool	CreateVPhysics();
-	void			BrickbatTouch( CBaseEntity *pOther );
-	void			BrickbatThink( void );
+	void			BrickbatTouch(CBaseEntity *pOther);
+	void			BrickbatThink(void);
+
+//	int m_nHeadcrabType;
 
 	BrickbatAmmo_t	m_nType;
 	bool			m_bExplodes;

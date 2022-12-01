@@ -21,7 +21,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern ConVar    sk_plr_dmg_smg1_grenade;	
+//extern ConVar    sk_plr_dmg_smg1_grenade;	
 
 class CWeaponSMG1 : public CHLSelectFireMachineGun
 {
@@ -35,17 +35,17 @@ public:
 	
 	void	Precache( void );
 	void	AddViewKick( void );
-	void	SecondaryAttack( void );
+	//void	SecondaryAttack( void );
 
-	int		GetMinBurst() { return 2; }
-	int		GetMaxBurst() { return 5; }
+	int		GetMinBurst() { return 4; }      //{ return 2; }
+	int		GetMaxBurst() { return 7; }      //{ return 5; }
 
 	virtual void Equip( CBaseCombatCharacter *pOwner );
 	bool	Reload( void );
 
-	float	GetFireRate( void ) { return 0.075f; }	// 13.3hz
+	float	GetFireRate( void ) { return 0.1f; }	// { return 0.075f; }     //13.3hz
 	int		CapabilitiesGet( void ) { return bits_CAP_WEAPON_RANGE_ATTACK1; }
-	int		WeaponRangeAttack2Condition( float flDot, float flDist );
+	//int		WeaponRangeAttack2Condition( float flDot, float flDist );
 	Activity	GetPrimaryAttackActivity( void );
 
 	virtual const Vector& GetBulletSpread( void )
@@ -140,19 +140,23 @@ CWeaponSMG1::CWeaponSMG1( )
 {
 	m_fMinRange1		= 0;// No minimum range. 
 	m_fMaxRange1		= 1400;
+	
+	m_iFireMode = FIREMODE_FULLAUTO;
 
-	m_bAltFiresUnderwater = false;
+//	m_bAltFiresUnderwater = false;
 }
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CWeaponSMG1::Precache( void )
 {
-	UTIL_PrecacheOther("grenade_ar2");
+//	UTIL_PrecacheOther("grenade_ar2");
 
 	BaseClass::Precache();
 }
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Give this weapon longer range when wielded by an ally NPC.
@@ -306,7 +310,7 @@ bool CWeaponSMG1::Reload( void )
 void CWeaponSMG1::AddViewKick( void )
 {
 	#define	EASY_DAMPEN			0.5f
-	#define	MAX_VERTICAL_KICK	1.0f	//Degrees
+	#define	MAX_VERTICAL_KICK	4.0f    //1.0f	//Degrees
 	#define	SLIDE_LIMIT			2.0f	//Seconds
 	
 	//Get the view kick
@@ -318,6 +322,7 @@ void CWeaponSMG1::AddViewKick( void )
 	DoMachineGunKick( pPlayer, EASY_DAMPEN, MAX_VERTICAL_KICK, m_fFireDuration, SLIDE_LIMIT );
 }
 
+/*
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -387,6 +392,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 }
 
 #define	COMBINE_MIN_GRENADE_CLEAR_DIST 256
+*/
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -394,11 +400,13 @@ void CWeaponSMG1::SecondaryAttack( void )
 //			flDist - 
 // Output : int
 //-----------------------------------------------------------------------------
+/*
 int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 {
 	CAI_BaseNPC *npcOwner = GetOwner()->MyNPCPointer();
 
 	return COND_NONE;
+*/
 
 /*
 	// --------------------------------------------------------
@@ -408,6 +416,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 		return m_lastGrenadeCondition;
 */
 
+/*
 	// -----------------------
 	// If moving, don't check.
 	// -----------------------
@@ -493,6 +502,8 @@ int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 		return COND_WEAPON_SIGHT_OCCLUDED;
 	}
 }
+
+*/
 
 //-----------------------------------------------------------------------------
 const WeaponProficiencyInfo_t *CWeaponSMG1::GetProficiencyValues()

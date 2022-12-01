@@ -100,6 +100,8 @@ ConVar npc_strider_shake_ropes_magnitude( "npc_strider_shake_ropes_magnitude", "
 
 ConVar strider_ar2_altfire_dmg( "strider_ar2_altfire_dmg", "25" );
 
+ConVar strider_gauss_dmg("strider_gauss_dmg", "15");
+
 // Number of RPG hits it takes to kill a strider on each skill level.
 ConVar sk_strider_num_missiles1("sk_strider_num_missiles1", "5");
 ConVar sk_strider_num_missiles2("sk_strider_num_missiles2", "7");
@@ -3052,6 +3054,8 @@ void CNPC_Strider::TraceAttack( const CTakeDamageInfo &inputInfo, const Vector &
 //---------------------------------------------------------
 int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
+	float damage = info.GetDamage();
+
 	// don't take damage from my own weapons!!!
 	if ( info.GetInflictor() && info.GetInflictor()->GetOwnerEntity() == this )
 		return 0;
@@ -3062,6 +3066,12 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 	if ( info.GetDamageType() == DMG_GENERIC )
 		return BaseClass::OnTakeDamage_Alive( info );
+
+	//Damage from max gauss charge
+	if (info.GetDamageType() == DMG_SHOCK)
+	{
+		damage = strider_gauss_dmg.GetFloat();
+	}
 
 	if( IsUsingAggressiveBehavior() )
 	{

@@ -27,7 +27,7 @@
 using namespace vgui;
 
 #include "hudelement.h"
-#include "hud_numericdisplay.h"
+#include "hud_bitmapnumericdisplay.h"
 
 #include "convar.h"
 
@@ -39,9 +39,9 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose: Health panel
 //-----------------------------------------------------------------------------
-class CHudHealth : public CHudElement, public CHudNumericDisplay
+class CHudHealth : public CHudElement, public CHudBitmapNumericDisplay
 {
-	DECLARE_CLASS_SIMPLE( CHudHealth, CHudNumericDisplay );
+	DECLARE_CLASS_SIMPLE(CHudHealth, CHudBitmapNumericDisplay);
 
 public:
 	CHudHealth( const char *pElementName );
@@ -54,9 +54,12 @@ public:
 private:
 	// old variables
 	int		m_iHealth;
-	
+
+	float	m_fFade;
 	int		m_bitsDamage;
-};	
+	int		m_iGhostHealth;
+
+};
 
 DECLARE_HUDELEMENT( CHudHealth );
 DECLARE_HUD_MESSAGE( CHudHealth, Damage );
@@ -64,7 +67,7 @@ DECLARE_HUD_MESSAGE( CHudHealth, Damage );
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CHudHealth::CHudHealth( const char *pElementName ) : CHudElement( pElementName ), CHudNumericDisplay(NULL, "HudHealth")
+CHudHealth::CHudHealth( const char *pElementName ) : CHudElement( pElementName ), CHudBitmapNumericDisplay( NULL, "HudHealth" )
 {
 	SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_PLAYERDEAD | HIDEHUD_NEEDSUIT );
 }
@@ -84,19 +87,24 @@ void CHudHealth::Init()
 void CHudHealth::Reset()
 {
 	m_iHealth		= INIT_HEALTH;
+	m_iGhostHealth  = 100;
+	m_fFade         = 0;
 	m_bitsDamage	= 0;
 
 	wchar_t *tempString = g_pVGuiLocalize->Find("#Valve_Hud_HEALTH");
 
 	if (tempString)
 	{
-		SetLabelText(tempString);
+		//SetLabelText(tempString);
 	}
 	else
 	{
-		SetLabelText(L"HEALTH");
+		//SetLabelText(L"HEALTH");
 	}
+	SetLabelText(L"HEALTH");
 	SetDisplayValue(m_iHealth);
+
+	SetPaintBackgroundEnabled( false) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -126,6 +134,8 @@ void CHudHealth::OnThink()
 		return;
 	}
 
+	m_iGhostHealth = m_iHealth;
+	m_fFade = 200;
 	m_iHealth = newHealth;
 
 	if ( m_iHealth >= 20 )

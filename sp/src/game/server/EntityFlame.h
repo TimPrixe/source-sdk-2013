@@ -49,6 +49,7 @@ public:
 protected:
 
 	void InputIgnite( inputdata_t &inputdata );
+	void InputIgnitePlasma( inputdata_t &inputdata );
 
 	void	FlameThink( void );
 
@@ -60,7 +61,9 @@ protected:
 	CNetworkVar( float, m_flHitboxFireScale );
 
 	CNetworkVar( float, m_flLifetime );
+	CNetworkVar( bool, m_bUsePlasma);
 	bool	m_bPlayingSound;
+	float	m_flDamageTime;
 };
 
 #endif // ENTITYFLAME_H

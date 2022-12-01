@@ -62,17 +62,17 @@ extern Vector		g_vecAttackDir;
 		"item_rpg_round",			// 12
 		"unused (item_smg1_grenade) 13",// 13
 		"item_box_sniper_rounds",	// 14
-		"unused (???"") 15",		// 15 - split into two strings to avoid trigraph warning 
+		"weapon_gauss",		// 15 - split into two strings to avoid trigraph warning 
 		"weapon_stunstick",			// 16
-		"unused (weapon_ar1) 17",	// 17
+		"unused (weapon_brickbat) 17",	// 17
 		"weapon_ar2",				// 18
 		"unused (???"") 19",		// 19 - split into two strings to avoid trigraph warning 
 		"weapon_rpg",				// 20
 		"weapon_smg1",				// 21
-		"unused (weapon_smg2) 22",	// 22
+		"unused (weapon_irifle) 22",	// 22
 		"unused (weapon_slam) 23",	// 23
 		"weapon_shotgun",			// 24
-		"unused (weapon_molotov) 25",// 25
+		"weapon_molotov",// 25
 		"item_dynamic_resupply",	// 26
 	};
 #else

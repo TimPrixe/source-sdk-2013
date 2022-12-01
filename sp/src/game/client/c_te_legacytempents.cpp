@@ -1739,6 +1739,19 @@ void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachm
 		}
 		break;
 
+		// AR2
+		//
+	case MUZZLEFLASH_AR2:
+		if (firstPerson)
+		{
+			MuzzleFlash_AR2_Player(hEntity, attachmentIndex);
+		}
+		else
+		{
+			MuzzleFlash_AR2_NPC(hEntity, attachmentIndex);
+		}
+		break;
+
 	case MUZZLEFLASH_SMG1:
 		if ( firstPerson )
 		{
@@ -1837,6 +1850,19 @@ void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type,
 		else
 		{
 			MuzzleFlash_SMG1_NPC( hEntity, 1 );
+		}
+		break;
+
+		// AR2
+		//
+	case MUZZLEFLASH_AR2:
+		if (firstPerson)
+		{
+			MuzzleFlash_AR2_Player(hEntity, 1);
+		}
+		else
+		{
+			MuzzleFlash_AR2_NPC(hEntity, 1);
 		}
 		break;
 
@@ -2492,6 +2518,14 @@ inline void CTempEnts::CacheMuzzleFlashes( void )
 		}
 	}
 
+	for (i = 0; i < 5; i++)
+	{
+		if (m_Material_AR2_MuzzleFlash_Player[i] == NULL)
+		{
+			m_Material_AR2_MuzzleFlash_Player[i] = ParticleMgr()->GetPMaterial(VarArgs("sprites/ar2_muzzle%d", i + 1));
+		}
+	}
+
 	for ( i = 0; i < 4; i++ )
 	{
 		if ( m_Material_MuzzleFlash_NPC[i] == NULL )
@@ -2801,11 +2835,212 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 // Purpose: 
 // Input: 
 //==================================================
+void CTempEnts::MuzzleFlash_AR2_Player(ClientEntityHandle_t hEntity, int attachmentIndex)
+{
+//#if 1
 
-void CTempEnts::MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity )
+	VPROF_BUDGET("MuzzleFlash_AR2_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING);
+	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create("MuzzleFlash_AR2_Player", hEntity, attachmentIndex, FLE_VIEWMODEL);
+
+//	float	scale = 1.5f;
+
+	CacheMuzzleFlashes();
+
+	SimpleParticle *pParticle;
+	Vector			forward(1, 0, 0), offset; //NOTENOTE: All coords are in local space
+
+	float flScale = random->RandomFloat(2.0f, 2.25f);
+
+	pSimple->SetDrawBeforeViewModel(true);
+
+	// Flash
+	for (int i = 1; i < 6; i++)
+	{
+		offset = (forward * (i*8.0f*flScale));
+
+		pParticle = (SimpleParticle *)pSimple->AddParticle(sizeof(SimpleParticle), m_Material_MuzzleFlash_Player[random->RandomInt(0, 3)], offset);
+
+		if (pParticle == NULL)
+			return;
+
+		pParticle->m_flLifetime = 0.0f;
+		pParticle->m_flDieTime = 0.025f;
+
+		pParticle->m_vecVelocity.Init();
+
+		pParticle->m_uchColor[0] = 255;
+		pParticle->m_uchColor[1] = 255;
+		pParticle->m_uchColor[2] = 200 + random->RandomInt(0, 55);
+
+		pParticle->m_uchStartAlpha = 255;
+		pParticle->m_uchEndAlpha = 255;
+
+		pParticle->m_uchStartSize = ((random->RandomFloat(6.0f, 8.0f) * (12 - (i)) / 12) * flScale);
+		pParticle->m_uchEndSize = pParticle->m_uchStartSize;
+		pParticle->m_flRoll = random->RandomInt(0, 360);
+		pParticle->m_flRollDelta = 0.0f;
+
+		//Setup our colors and type
+//		pParticle->m_nRenderMode = kRenderTransAdd;
+//		pParticle->SetRenderColor(164, 164, 164 + random->RandomInt(0, 64), 255);
+//		pParticle->tempent_renderamt = 255;
+//		pParticle->m_nRenderFX = kRenderFxNone;
+//		pParticle->flags = FTENT_PERSIST;
+//		pParticle->die = gpGlobals->curtime + 0.025f;
+//		pParticle->m_flFrame = 0;
+//		pParticle->m_flFrameMax = 0;
+
+//		pParticle->SetLocalOrigin(offset);
+//		pParticle->SetLocalAngles(vec3_angle);
+
+//		pParticle->SetVelocity(vec3_origin);
+
+		//Scale and rotate
+//		pParticle->m_flSpriteScale = ((random->RandomFloat(6.0f, 8.0f) * (12 - (i)) / 9) * flScale) / 32;
+//		pParticle->SetLocalAnglesDim(Z_INDEX, random->RandomInt(0, 360));
+
+//		view->AddVisibleEntity(pTemp);
+	}
+
+	// Tack on the smoke
+	pParticle = (SimpleParticle *)pSimple->AddParticle(sizeof(SimpleParticle), m_Material_MuzzleFlash_Player[random->RandomInt(0, 1)], vec3_origin);
+
+	if (pParticle == NULL)
+		return;
+
+	pParticle->m_flLifetime = 0.0f;
+	pParticle->m_flDieTime = 0.025f;
+
+	pParticle->m_vecVelocity.Init();
+
+	pParticle->m_uchColor[0] = 255;
+	pParticle->m_uchColor[1] = 255;
+	pParticle->m_uchColor[2] = 255;
+
+	pParticle->m_uchStartAlpha = random->RandomInt(64, 128);
+	pParticle->m_uchEndAlpha = 32;
+
+	pParticle->m_uchStartSize = random->RandomFloat(10.0f, 16.0f);
+	pParticle->m_uchEndSize = pParticle->m_uchStartSize;
+
+	pParticle->m_flRoll = random->RandomInt(0, 360);
+	pParticle->m_flRollDelta = 0.0f;
+
+	/*
+	//Flare
+	pParticle = TempEntAlloc(origin, (model_t *)m_pSpriteMuzzleFlash[0]);
+
+	if (pParticle == NULL)
+		return;
+
+	//Setup our colors and type
+	pTemp->m_nRenderMode = kRenderTransAdd;
+	pTemp->SetRenderColor(255, 255, 255, 255);
+	pTemp->tempent_renderamt = 255;
+	pTemp->m_nRenderFX = kRenderFxNone;
+	pTemp->flags = FTENT_PERSIST;
+	pTemp->die = gpGlobals->curtime + 0.025f;
+	pTemp->m_flFrame = 0;
+	pTemp->m_flFrameMax = 0;
+
+	pTemp->SetLocalOrigin(origin);
+	pTemp->SetLocalAngles(vec3_angle);
+
+	pTemp->SetVelocity(vec3_origin);
+
+	//Scale and rotate
+	pTemp->m_flSpriteScale = random->RandomFloat(0.05f, 0.1f);
+	pTemp->SetLocalAnglesDim(Z_INDEX, random->RandomInt(0, 360));
+
+	view->AddVisibleEntity(pTemp);
+	*/
+/*
+#else
+
+	C_LocalTempEntity *pTemp = TempEntAlloc(origin, (model_t *)m_pSpriteMuzzleFlash[0]);
+
+	if (pTemp == NULL)
+		return;
+
+	//Setup our colors and type
+	pTemp->m_nRenderMode = kRenderTransAdd;
+	pTemp->m_clrRender.r = 255;
+	pTemp->m_clrRender.g = 255;
+	pTemp->m_clrRender.b = 255;
+	pTemp->m_clrRender.a = 255;
+	pTemp->tempent_renderamt = 255;
+	pTemp->m_nRenderFX = kRenderFxNone;
+	pTemp->flags = FTENT_NONE;
+	pTemp->die = gpGlobals->curtime + 0.025f;
+	pTemp->m_flFrame = 0;
+	pTemp->m_flFrameMax = 0;
+
+	pTemp->SetLocalOrigin(origin);
+	pTemp->SetLocalAngles(vec3_angle);
+
+	pTemp->SetVelocity(vec3_origin);
+
+	//Scale and rotate
+	pTemp->m_flSpriteScale = random->RandomFloat(0.1f, 0.15f);
+	pTemp->SetAnglesDim(Z_INDEX, (360.0f / 6.0f) * random->RandomInt(0, 5));
+
+	view->AddVisibleEntity(pTemp);
+
+	//
+	// Smoke
+	//
+
+	Vector forward, start, end;
+
+	AngleVectors(angles, &forward);
+
+	start = (Vector)origin - (forward * 8);
+	end = (Vector)origin + (forward * random->RandomFloat(48, 128));
+
+	unsigned int	flags = 0;
+
+	if (random->RandomInt(0, 1))
+	{
+		flags |= FXSTATICLINE_FLIP_HORIZONTAL;
+	}
+
+	const char *text = (random->RandomInt(0, 1)) ? "sprites/ar2_muzzle3" : "sprites/ar2_muzzle4";
+
+	FX_AddStaticLine(start, end, random->RandomFloat(8.0f, 14.0f), 0.01f, text, flags);
+
+	// 
+	// Dynamic light
+	//
+
+	/*
+	if ( muzzleflash_light.GetInt() )
+	{
+	dlight_t *dl = effects->CL_AllocDlight( LIGHT_INDEX_MUZZLEFLASH + entityIndex );
+
+	dl->origin	= origin;
+
+	dl->color.r = 255;
+	dl->color.g = 225;
+	dl->color.b = 164;
+	dl->color.exponent = 5;
+
+	dl->radius	= 100;
+	dl->decay	= dl->radius / 0.05f;
+	dl->die		= gpGlobals->curtime + 0.05f;
+	}
+	*/
+//#endif
+}
+
+//==================================================
+// Purpose: 
+// Input: 
+//==================================================
+
+void CTempEnts::MuzzleFlash_AR2_NPC(ClientEntityHandle_t hEntity, int attachmentIndex)
 {
 	//Draw the cloud of fire
-	FX_MuzzleEffect( origin, angles, 1.0f, hEntity );
+	FX_MuzzleEffectAttached(1.0f, hEntity, attachmentIndex, NULL, true);
 }
 
 //-----------------------------------------------------------------------------

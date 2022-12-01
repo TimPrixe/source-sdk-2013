@@ -29,6 +29,7 @@
 #include "weapon_physcannon.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "npc_headcrab.h"
+#include "grenade_ar2.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -279,11 +280,13 @@ void CNPC_Combine::InputThrowGrenadeAtTarget( inputdata_t &inputdata )
 void CNPC_Combine::Precache()
 {
 	PrecacheModel("models/Weapons/w_grenade.mdl");
+	PrecacheModel("models/Weapons/ar2_grenade.mdl");
 	UTIL_PrecacheOther( "npc_handgrenade" );
+	UTIL_PrecacheOther("grenade_ar2");
 
 	PrecacheScriptSound( "NPC_Combine.GrenadeLaunch" );
 	PrecacheScriptSound( "NPC_Combine.WeaponBash" );
-	PrecacheScriptSound( "Weapon_CombineGuard.Special1" );
+	PrecacheScriptSound( "Weapon_AR2.NPC_Double" );
 
 	BaseClass::Precache();
 }
@@ -2320,7 +2323,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 	{
 		if ( pEvent->event == COMBINE_AE_BEGIN_ALTFIRE )
 		{
-			EmitSound( "Weapon_CombineGuard.Special1" );
+			EmitSound( "Weapon_AR2.NPC_Double" );
 			handledEvent = true;
 		}
 		else if ( pEvent->event == COMBINE_AE_ALTFIRE )
@@ -2414,7 +2417,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 			{
 				EmitSound( "NPC_Combine.GrenadeLaunch" );
 
-				CBaseEntity *pGrenade = CreateNoSpawn( "npc_contactgrenade", Weapon_ShootPosition(), vec3_angle, this );
+				CBaseEntity *pGrenade = CreateNoSpawn( "grenade_ar2", Weapon_ShootPosition(), vec3_angle, this );
 				pGrenade->KeyValue( "velocity", m_vecTossVelocity );
 				pGrenade->Spawn( );
 
@@ -3140,14 +3143,14 @@ WeaponProficiency_t CNPC_Combine::CalcWeaponProficiency( CBaseCombatWeapon *pWea
 {
 	if( FClassnameIs( pWeapon, "weapon_ar2" ) )
 	{
-		if( hl2_episodic.GetBool() )
-		{
+		//if( hl2_episodic.GetBool() )
+		//{
 			return WEAPON_PROFICIENCY_VERY_GOOD;
-		}
-		else
-		{
-			return WEAPON_PROFICIENCY_GOOD;
-		}
+		//}
+		//else
+		//{
+		//	return WEAPON_PROFICIENCY_GOOD;
+		//}
 	}
 	else if( FClassnameIs( pWeapon, "weapon_shotgun" )	)
 	{
@@ -3160,7 +3163,7 @@ WeaponProficiency_t CNPC_Combine::CalcWeaponProficiency( CBaseCombatWeapon *pWea
 	}
 	else if( FClassnameIs( pWeapon, "weapon_smg1" ) )
 	{
-		return WEAPON_PROFICIENCY_GOOD;
+		return WEAPON_PROFICIENCY_VERY_GOOD;
 	}
 
 	return BaseClass::CalcWeaponProficiency( pWeapon );

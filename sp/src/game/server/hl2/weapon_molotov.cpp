@@ -35,6 +35,7 @@ BEGIN_DATADESC( CWeaponMolotov )
 
 	// Function Pointers
 	DEFINE_FUNCTION( MolotovTouch ),
+	DEFINE_FUNCTION( ThrowingThink ),
 
 END_DATADESC()
 
@@ -54,7 +55,7 @@ IMPLEMENT_ACTTABLE(CWeaponMolotov);
 
 void CWeaponMolotov::Precache( void )
 {
-	PrecacheModel("models/props_junk/w_garb_beerbottle.mdl");	//<<TEMP>> need real model
+	PrecacheModel("models/Weapons/w_molotov.mdl");	//<<TEMP>> need real model
 	BaseClass::Precache();
 }
 
@@ -63,7 +64,7 @@ void CWeaponMolotov::Spawn( void )
 	// Call base class first
 	BaseClass::Spawn();
 
-	m_bNeedDraw		= true;
+	m_bNeedDraw = false;
 
 	SetModel( GetWorldModel() );
 	UTIL_SetSize(this, Vector( -6, -6, -2), Vector(6, 6, 2));
@@ -76,7 +77,7 @@ void CWeaponMolotov::Spawn( void )
 //------------------------------------------------------------------------------
 void CWeaponMolotov::SetPickupTouch( void )
 {
-	SetTouch(MolotovTouch);
+	SetTouch(&CWeaponMolotov::MolotovTouch);
 }
 
 //-----------------------------------------------------------------------------
@@ -103,7 +104,7 @@ void CWeaponMolotov::MolotovTouch( CBaseEntity *pOther )
 		CWeaponMolotov* oldWeapon = (CWeaponMolotov*)pBCC->Weapon_OwnsThisType( GetClassname() );
 		if (oldWeapon != this)
 		{
-			UTIL_Remove( this );
+			UTIL_Remove( oldWeapon );
 		}
 		else
 		{
@@ -153,9 +154,20 @@ void CWeaponMolotov::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatC
 			// Otherwise just set to in front of the owner
 			else 
 			{
-				Vector vFacingDir = pNPC->BodyDirection2D( );
-				vFacingDir = vFacingDir * 60.0; 
-				launchPos = pNPC->GetAbsOrigin()+vFacingDir;
+				iBIndex = pNPC->LookupBone("ValveBiped.Bip01_R_Hand");
+				if (iBIndex != -1)
+				{
+				    Vector vFacingDir = pNPC->BodyDirection2D( );
+				    vFacingDir = vFacingDir * 60.0; 
+				    launchPos = pNPC->GetAbsOrigin()+vFacingDir;
+			     }
+				else
+				{
+					Vector vFacingDir = pNPC->BodyDirection2D();
+					vFacingDir = vFacingDir * 60.0;
+					launchPos = pNPC->GetAbsOrigin() + vFacingDir;
+				}
+
 			}
 
 
@@ -336,6 +348,7 @@ void CWeaponMolotov::PrimaryAttack( void )
 		return;
 	}
 
+/*
 	Vector vecSrc		= pPlayer->WorldSpaceCenter();
 	Vector vecFacing	= pPlayer->BodyDirection3D( );
 	vecSrc				= vecSrc + vecFacing * 18.0;
@@ -354,13 +367,18 @@ void CWeaponMolotov::PrimaryAttack( void )
 
 	ThrowMolotov(vecSrc, vecAiming*800);
 	pPlayer->RemoveAmmo( 1, m_iSecondaryAmmoType );
-
+*/
 	
 	// Don't fire again until fire animation has completed
 	//m_flNextPrimaryAttack = gpGlobals->curtime + CurSequenceDuration();
 	//<<TEMP>> - till real animation is avaible
-	m_flNextPrimaryAttack = gpGlobals->curtime + 1.0;
-	m_flNextSecondaryAttack = gpGlobals->curtime + 1.0;
+//	m_flNextPrimaryAttack = gpGlobals->curtime + 1.0;
+//	m_flNextSecondaryAttack = gpGlobals->curtime + 1.0;
+
+	SendWeaponAnim(ACT_VM_THROW);
+
+	SetThink(&CWeaponMolotov::ThrowingThink);
+	SetNextThink(gpGlobals->curtime + 0.5f);
 
 	m_bNeedDraw = true;
 }
@@ -378,6 +396,55 @@ void CWeaponMolotov::SecondaryAttack( void )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
+//-----------------------------------------------------------------------------
+void CWeaponMolotov::ThrowingThink(void)
+{
+	CBasePlayer *pPlayer = ToBasePlayer(GetOwner());
+
+	if (!pPlayer)
+	{
+		return;
+	}
+
+	Vector vecSrc = pPlayer->WorldSpaceCenter();
+	Vector vecFacing = pPlayer->BodyDirection3D();
+	vecSrc = vecSrc + vecFacing * 18.0;
+	// BUGBUG: is this some hack because it's not at the eye position????
+	vecSrc.z += 24.0f;
+
+	// Player may have turned to face a wall during the throw anim in which case
+	// we don't want to throw the SLAM into the wall
+	if (ObjectInWay())
+	{
+		vecSrc = pPlayer->WorldSpaceCenter() + vecFacing * 5.0;
+	}
+
+	Vector vecAiming = pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
+	vecAiming.z += 0.20; // Raise up so passes through reticle
+
+	ThrowMolotov(vecSrc, vecAiming * 800);
+	pPlayer->RemoveAmmo(1, m_iSecondaryAmmoType);
+
+	CBaseCombatCharacter *pOwner = GetOwner();
+	if (pOwner->GetAmmoCount(m_iSecondaryAmmoType) <= 0)
+	{
+		pOwner->Weapon_Drop(this);
+		UTIL_Remove(this);
+		return;
+		//pOwner->SwitchToNextBestWeapon(this);
+	}
+
+	SendWeaponAnim(ACT_VM_DRAW);
+
+	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
+
+	SetThink(NULL);
+	SetNextThink(gpGlobals->curtime);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
 //
 //
 //-----------------------------------------------------------------------------
@@ -386,19 +453,20 @@ void CWeaponMolotov::DrawAmmo( void )
 	// -------------------------------------------
 	// Make sure I have ammo of the current type
 	// -------------------------------------------
-	CBaseCombatCharacter *pOwner = GetOwner();
+/*	CBaseCombatCharacter *pOwner = GetOwner();
 	if (pOwner->GetAmmoCount(m_iSecondaryAmmoType) <=0)
 	{
 		pOwner->Weapon_Drop( this );
 		UTIL_Remove(this);
 		return;
 	}
-	Msg("Drawing Molotov...\n");
+*/
+	//Msg("Drawing Molotov...\n");
 	m_bNeedDraw = false;
 
 	//<<TEMP>> - till real animation is avaible
-	m_flNextPrimaryAttack	= gpGlobals->curtime + 2.0;
-	m_flNextSecondaryAttack = gpGlobals->curtime + 2.0;
+	m_flNextPrimaryAttack = gpGlobals->curtime + SequenceDuration();
+	m_flNextSecondaryAttack = gpGlobals->curtime + SequenceDuration();
 
 }
 

@@ -3538,6 +3538,10 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		{
 			weaponType = MUZZLEFLASH_COMBINE;
 		}
+		else if (Q_stricmp(token, "AR2") == 0)   //Reptile
+		{
+			weaponType = MUZZLEFLASH_AR2;
+		}
 		else if ( Q_stricmp( token, "SMG1" ) == 0 )
 		{
 			weaponType = MUZZLEFLASH_SMG1;

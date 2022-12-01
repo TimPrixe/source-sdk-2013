@@ -29,8 +29,6 @@ public:
 	CHandle< SmokeTrail > m_hSmokeTrail;
 	float				 m_fSpawnTime;
 	float				m_fDangerRadius;
-
-
 	void		Spawn( void );
 	void		Precache( void );
 	void 		GrenadeAR2Touch( CBaseEntity *pOther );

@@ -31,6 +31,15 @@ public:
 protected:
 
 	SmokeTrail		*m_pFireTrail;
+	void SetDetonateTimerLength(float timer);
+
+	void SetTimer(float timer);
+
+	IntervalTimer m_stillTimer;
+	IntervalTimer m_throwDetTimer;
+	float m_flDetonateTime;
+
+//	CFireTrail      *m_pFireTrail;
 
 	DECLARE_DATADESC();
 };

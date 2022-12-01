@@ -596,6 +596,7 @@ CFire::CFire( void )
 void CFire::UpdateOnRemove( void )
 {
 	//Stop any looping sounds that might be playing
+	StopSound( "Fire.Natural" );
 	StopSound( "Fire.Plasma" );
 
 	DestroyEffect();
@@ -636,6 +637,7 @@ void CFire::Precache( void )
 	}
 
 	PrecacheScriptSound( "Fire.Plasma" );
+	PrecacheScriptSound( "Fire.Natural" );
 }
 
 //------------------------------------------------------------------------------
@@ -788,6 +790,10 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 			pEffect			= fireSmoke;
 			m_nFireType		= FIRE_NATURAL;
 			m_takedamage	= DAMAGE_YES;
+			if (m_spawnflags & SF_FIRE_EMIT_SOUND) // VXP
+			{
+				EmitSound("Fire.Natural");
+			}
 		}
 		break;
 

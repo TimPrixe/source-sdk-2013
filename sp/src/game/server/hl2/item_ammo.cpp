@@ -367,7 +367,7 @@ public:
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
-		if (ITEM_GiveAmmo( pPlayer, 1, "FlareRound"))
+		if (ITEM_GiveAmmo(pPlayer, SIZE_AMMO_FLARE_ROUND, "FlareRound"))
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
@@ -383,7 +383,6 @@ LINK_ENTITY_TO_CLASS(item_flare_round, CItem_FlareRound);
 // ========================================================================
 //	>> BoxFlareRounds
 // ========================================================================
-#define SIZE_BOX_FLARE_ROUNDS 5
 
 class CItem_BoxFlareRounds : public CItem
 {
@@ -414,6 +413,8 @@ public:
 	}
 };
 LINK_ENTITY_TO_CLASS(item_box_flare_rounds, CItem_BoxFlareRounds);
+
+
 
 // ========================================================================
 // RPG Round
@@ -575,7 +576,7 @@ public:
 
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
-		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_AR2_ALTFIRE, "AR2AltFire" ) )
+		if (ITEM_GiveAmmo( pPlayer, SIZE_AMMO_AR2_ALTFIRE, "AR2AltFire" ) ) //AR2AltFire
 		{
 			if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )
 			{
@@ -687,8 +688,8 @@ const char *CItem_AmmoCrate::m_lpzModelNames[NUM_AMMO_CRATE_TYPES] =
 	"models/items/ammocrate_rockets.mdl",	// RPG rounds
 	"models/items/ammocrate_buckshot.mdl",	// Buckshot
 	"models/items/ammocrate_grenade.mdl",	// Grenades
-	"models/items/ammocrate_smg1.mdl",		// 357
-	"models/items/ammocrate_smg1.mdl",	// Crossbow
+	"models/items/ammocrate_357.mdl",		// 357
+	"models/items/ammocrate_bullets.mdl",	// Crossbow
 	
 	//FIXME: This model is incorrect!
 	"models/items/ammocrate_ar2.mdl",		// Combine Ball 
@@ -713,6 +714,7 @@ const char *CItem_AmmoCrate::m_lpzAmmoNames[NUM_AMMO_CRATE_TYPES] =
 // Ammo amount given per +use
 int CItem_AmmoCrate::m_nAmmoAmounts[NUM_AMMO_CRATE_TYPES] =
 {
+	/* // Before
 	300,	// Pistol
 	300,	// SMG1
 	300,	// AR2
@@ -722,7 +724,17 @@ int CItem_AmmoCrate::m_nAmmoAmounts[NUM_AMMO_CRATE_TYPES] =
 	50,		// 357
 	50,		// Crossbow
 	3,		// AR2 alt-fire
-	5,
+	*/
+
+	120,	// Pistol
+	120,	// SMG1
+	90,	// AR2
+	3,		// RPG rounds
+	36,	// Buckshot
+	5,		// Grenades
+	50,		// 357
+	50,		// Crossbow
+	3,		// AR2 alt-fire
 };
 
 const char *CItem_AmmoCrate::m_pGiveWeapon[NUM_AMMO_CRATE_TYPES] =

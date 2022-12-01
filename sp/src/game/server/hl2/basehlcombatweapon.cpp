@@ -340,8 +340,9 @@ void CHLSelectFireMachineGun::PrimaryAttack( void )
 		break;
 
 	case FIREMODE_3RNDBURST:
+
 		m_iBurstSize = GetBurstSize();
-		
+		m_iClip1 = m_iClip1 - 2;
 		// Call the think function directly so that the first round gets fired immediately.
 		BurstThink();
 		SetThink( &CHLSelectFireMachineGun::BurstThink );

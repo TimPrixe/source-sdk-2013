@@ -81,8 +81,8 @@ public:
 	bool AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info );
 
 	bool	NPC_ShouldDropGrenade( CBasePlayer *pRecipient );
-	bool	NPC_ShouldDropHealth( CBasePlayer *pRecipient );
-	void	NPC_DroppedHealth( void );
+	bool	NPC_ShouldDropAR2AltFire( CBasePlayer *pRecipient );
+	void	NPC_DroppedAR2AltFire( void );
 	void	NPC_DroppedGrenade( void );
 	bool	MegaPhyscannonActive( void ) { return m_bMegaPhysgun;	}
 	
@@ -90,7 +90,7 @@ public:
 
 private:
 
-	float	m_flLastHealthDropTime;
+	float	m_flLastAR2AltFireDropTime;
 	float	m_flLastGrenadeDropTime;
 
 	void AdjustPlayerDamageTaken( CTakeDamageInfo *pInfo );

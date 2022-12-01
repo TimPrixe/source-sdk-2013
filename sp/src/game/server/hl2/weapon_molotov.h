@@ -56,6 +56,8 @@ public:
 
 	void				Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatCharacter *pOperator );
 
+	void				ThrowingThink(void);
+
 	DECLARE_ACTTABLE();
 	DECLARE_DATADESC();
 

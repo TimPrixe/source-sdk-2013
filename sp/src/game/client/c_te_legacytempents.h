@@ -173,6 +173,7 @@ private:
 
 	inline void				CacheMuzzleFlashes( void );
 	PMaterialHandle			m_Material_MuzzleFlash_Player[4];
+	PMaterialHandle			m_Material_AR2_MuzzleFlash_Player[5];   //Reptile
 	PMaterialHandle			m_Material_MuzzleFlash_NPC[4];
 	PMaterialHandle			m_Material_Combine_MuzzleFlash_Player[2];
 	PMaterialHandle			m_Material_Combine_MuzzleFlash_NPC[2];
@@ -188,8 +189,11 @@ private:
 	int						AddVisibleTempEntity( C_LocalTempEntity *pEntity );
 
 	// AR2
-	void					MuzzleFlash_AR2_Player( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity );
-	void					MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity );
+//	void					MuzzleFlash_AR2_Player( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity );
+//	void					MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity );
+
+	void					MuzzleFlash_AR2_Player(ClientEntityHandle_t hEntity, int attachmentIndex);
+	void					MuzzleFlash_AR2_NPC(ClientEntityHandle_t hEntity, int attachmentIndex);
 							
 	// SMG1					
 	void					MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attachmentIndex );

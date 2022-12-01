@@ -112,7 +112,7 @@ void CNPC_CombineS::Precache()
 
 	PrecacheModel( STRING( GetModelName() ) );
 
-	UTIL_PrecacheOther( "item_healthvial" );
+	//UTIL_PrecacheOther( "item_healthvial" );
 	UTIL_PrecacheOther( "weapon_frag" );
 	UTIL_PrecacheOther( "item_ammo_ar2_altfire" );
 
@@ -278,76 +278,89 @@ void CNPC_CombineS::OnListened()
 // Input  : &info - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
+void CNPC_CombineS::Event_Killed(const CTakeDamageInfo &info)
 {
 	// Don't bother if we've been told not to, or the player has a megaphyscannon
-	if ( combine_spawn_health.GetBool() == false || PlayerHasMegaPhysCannon() )
+	if (combine_spawn_health.GetBool() == false || PlayerHasMegaPhysCannon())
 	{
-		BaseClass::Event_Killed( info );
+		BaseClass::Event_Killed(info);
 		return;
 	}
 
-	CBasePlayer *pPlayer = ToBasePlayer( info.GetAttacker() );
+	CBasePlayer *pPlayer = ToBasePlayer(info.GetAttacker());
 
-	if ( !pPlayer )
+	if (!pPlayer)
 	{
-		CPropVehicleDriveable *pVehicle = dynamic_cast<CPropVehicleDriveable *>( info.GetAttacker() ) ;
-		if ( pVehicle && pVehicle->GetDriver() && pVehicle->GetDriver()->IsPlayer() )
+		CPropVehicleDriveable *pVehicle = dynamic_cast<CPropVehicleDriveable *>(info.GetAttacker());
+		if (pVehicle && pVehicle->GetDriver() && pVehicle->GetDriver()->IsPlayer())
 		{
-			pPlayer = assert_cast<CBasePlayer *>( pVehicle->GetDriver() );
+			pPlayer = assert_cast<CBasePlayer *>(pVehicle->GetDriver());
 		}
 	}
 
-	if ( pPlayer != NULL )
+	CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
+
+	if (pPlayer != NULL)
 	{
 		// Elites drop alt-fire ammo, so long as they weren't killed by dissolving.
-		if( IsElite() )
+		if (IsElite())
 		{
 #ifdef HL2_EPISODIC
 			if ( HasSpawnFlags( SF_COMBINE_NO_AR2DROP ) == false )
 #endif
 			{
-				CBaseEntity *pItem = DropItem( "item_ammo_ar2_altfire", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
-
-				if ( pItem )
+				if (HasSpawnFlags(SF_COMBINE_NO_GRENADEDROP) == false)
 				{
-					IPhysicsObject *pObj = pItem->VPhysicsGetObject();
-
-					if ( pObj )
+					if (pHL2GameRules->NPC_ShouldDropAR2AltFire(pPlayer))
 					{
-						Vector			vel		= RandomVector( -64.0f, 64.0f );
-						AngularImpulse	angImp	= RandomAngularImpulse( -300.0f, 300.0f );
 
-						vel[2] = 0.0f;
-						pObj->AddVelocity( &vel, &angImp );
-					}
+						CBaseEntity *pItem = DropItem("item_ammo_ar2_altfire", WorldSpaceCenter() + RandomVector(-4, 4), RandomAngle(0, 360));
 
-					if( info.GetDamageType() & DMG_DISSOLVE )
-					{
-						CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating*>(pItem);
-
-						if( pAnimating )
+						if (pItem)
 						{
-							pAnimating->Dissolve( NULL, gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL );
+							IPhysicsObject *pObj = pItem->VPhysicsGetObject();
+
+							if (pObj)
+							{
+								Vector			vel = RandomVector(-64.0f, 64.0f);
+								AngularImpulse	angImp = RandomAngularImpulse(-300.0f, 300.0f);
+
+								vel[2] = 0.0f;
+								pObj->AddVelocity(&vel, &angImp);
+							}
+
+							if (info.GetDamageType() & DMG_DISSOLVE)
+							{
+								CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating*>(pItem);
+
+								if (pAnimating)
+								{
+									pAnimating->Dissolve(NULL, gpGlobals->curtime, false, ENTITY_DISSOLVE_NORMAL);
+								}
+							}
+							else
+							{
+								WeaponManager_AddManaged(pItem);
+								pHL2GameRules->NPC_DroppedAR2AltFire();
+							}
 						}
-					}
-					else
-					{
-						WeaponManager_AddManaged( pItem );
 					}
 				}
 			}
 		}
 
-		CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
+
+//		CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
 
 		// Attempt to drop health
-		if ( pHL2GameRules->NPC_ShouldDropHealth( pPlayer ) )
+		/*
+		if ( pHL2GameRules->NPC_ShouldDropAR2AltFire( pPlayer ) )
 		{
 			DropItem( "item_healthvial", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
-			pHL2GameRules->NPC_DroppedHealth();
+			pHL2GameRules->NPC_DroppedAR2AltFire();
 		}
-		
+		*/
+
 		if ( HasSpawnFlags( SF_COMBINE_NO_GRENADEDROP ) == false )
 		{
 			// Attempt to drop a grenade

@@ -41,7 +41,7 @@ CHudSuitPower::CHudSuitPower( const char *pElementName ) : CHudElement( pElement
 void CHudSuitPower::Init( void )
 {
 	m_flSuitPower = SUITPOWER_INIT;
-	m_nSuitPowerLow = -1;
+	m_nSuitPowerLow = false;
 	m_iActiveSuitDevices = 0;
 }
 
@@ -77,12 +77,22 @@ bool CHudSuitPower::ShouldDraw()
 //-----------------------------------------------------------------------------
 void CHudSuitPower::OnThink( void )
 {
+	SetPaintEnabled(true);
+	SetPaintBackgroundEnabled(true);
+//	return;
+
 	float flCurrentPower = 0;
 	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
-	if ( !pPlayer )
+	if (!pPlayer)
 		return;
 
 	flCurrentPower = pPlayer->m_HL2Local.m_flSuitPower;
+
+//	C_BaseHLPlayer *local = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
+//	if (local)
+//	{
+//		flCurrentPower = local->m_HL2Local.m_flSuitPower;
+//	}
 
 	// Only update if we've changed suit power
 	if ( flCurrentPower == m_flSuitPower )
@@ -99,34 +109,20 @@ void CHudSuitPower::OnThink( void )
 		g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("SuitAuxPowerNotMax");
 	}
 
-	bool flashlightActive = pPlayer->IsFlashlightActive();
-	bool sprintActive = pPlayer->IsSprinting();
-	bool breatherActive = pPlayer->IsBreatherActive();
-	int activeDevices = (int)flashlightActive + (int)sprintActive + (int)breatherActive;
-
-	if (activeDevices != m_iActiveSuitDevices)
-	{
-		m_iActiveSuitDevices = activeDevices;
-
-		switch ( m_iActiveSuitDevices )
-		{
-		default:
-		case 3:
-			g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("SuitAuxPowerThreeItemsActive");
-			break;
-		case 2:
-			g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("SuitAuxPowerTwoItemsActive");
-			break;
-		case 1:
-			g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("SuitAuxPowerOneItemActive");
-			break;
-		case 0:
-			g_pClientMode->GetViewportAnimationController()->StartAnimationSequence("SuitAuxPowerNoItemsActive");
-			break;
-		}
-	}
-
 	m_flSuitPower = flCurrentPower;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CHudSuitPower::PaintBackground(void)
+{
+	int alpha = m_flAlphaOverride / 255;
+	Color bgColor = GetBgColor();
+	bgColor[3] *= alpha;
+	SetBgColor(bgColor);
+
+	BaseClass::PaintBackground();
 }
 
 //-----------------------------------------------------------------------------
@@ -134,6 +130,7 @@ void CHudSuitPower::OnThink( void )
 //-----------------------------------------------------------------------------
 void CHudSuitPower::Paint()
 {
+	/*
 	C_BaseHLPlayer *pPlayer = (C_BaseHLPlayer *)C_BasePlayer::GetLocalPlayer();
 	if ( !pPlayer )
 		return;
@@ -250,8 +247,12 @@ void CHudSuitPower::Paint()
 				surface()->DrawPrintText(L"SPRINT", wcslen(L"SPRINT"));
 			}
 			ypos += text2_gap;
-		}
-	}
+			*/
+    int xpos = m_flBarInsetX, ypos = m_flBarInsetY;
+//	PaintProgressBar(xpos, ypos, m_flSuitPower, 100, Color( m_AuxPowerColor[0], m_AuxPowerColor[1], m_AuxPowerColor[2], m_iAuxPowerDisabledAlpha ) );
+	float percentage = (float) m_flSuitPower / 100.0f;
+//	Color color = Color( m_AuxPowerColor[0], m_AuxPowerColor[1], m_AuxPowerColor[2], m_iAuxPowerDisabledAlpha );
+	gHUD.DrawProgressBar( xpos, ypos, m_flBarWidth, m_flBarHeight, percentage, m_AuxPowerColor, CHud::HUDPB_HORIZONTAL_INV );
 }
 
 

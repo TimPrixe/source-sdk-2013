@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -19,22 +19,23 @@ class CBeam;
 class CTripmineGrenade : public CBaseGrenade
 {
 public:
-	DECLARE_CLASS( CTripmineGrenade, CBaseGrenade );
+	DECLARE_CLASS(CTripmineGrenade, CBaseGrenade);
 
 	CTripmineGrenade();
-	void Spawn( void );
-	void Precache( void );
+	void Spawn(void);
+	void Precache(void);
 
-	int OnTakeDamage_Alive( const CTakeDamageInfo &info );
-	
-	void WarningThink( void );
-	void PowerupThink( void );
-	void BeamBreakThink( void );
-	void DelayDeathThink( void );
-	void Event_Killed( const CTakeDamageInfo &info );
+#if 0 
+	int OnTakeDamage_Alive(const CTakeDamageInfo &info);
+#endif
+	void WarningThink(void);
+	void PowerupThink(void);
+	void BeamBreakThink(void);
+	void DelayDeathThink(void);
+	void Event_Killed(const CTakeDamageInfo &info);
 
-	void MakeBeam( void );
-	void KillBeam( void );
+	void MakeBeam(void);
+	void KillBeam(void);
 
 public:
 	EHANDLE		m_hOwner;

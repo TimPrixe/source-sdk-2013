@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Item pickup history displayed onscreen when items are picked up.
 //
@@ -19,6 +19,10 @@
 using namespace vgui;
 
 extern ConVar hud_drawhistory_time;
+
+#define HISTORY_PICKUP_PICK_HEIGHT		(32 + (m_iHistoryGap * 2))
+#define HISTORY_PICKUP_HEIGHT_MAX		(ScreenHeight() - 64)
+#define	ITEM_GUTTER_SIZE				48
 
 DECLARE_HUDELEMENT( CHudHistoryResource );
 DECLARE_HUD_MESSAGE( CHudHistoryResource, ItemPickup );
@@ -82,14 +86,15 @@ void CHudHistoryResource::SetHistoryGap( int iNewHistoryGap )
 {
 }
 
+
 //-----------------------------------------------------------------------------
 // Purpose: adds an element to the history
 //-----------------------------------------------------------------------------
 void CHudHistoryResource::AddToHistory( C_BaseCombatWeapon *weapon )
 {
 	// don't draw exhaustable weapons (grenades) since they'll have an ammo pickup icon as well
- 	if ( weapon->GetWpnData().iFlags & ITEM_FLAG_EXHAUSTIBLE )
- 		return;
+	if ( weapon->GetWpnData().iFlags & ITEM_FLAG_EXHAUSTIBLE )
+		return;
 
 	int iId = weapon->entindex();
 
@@ -106,6 +111,7 @@ void CHudHistoryResource::AddToHistory( C_BaseCombatWeapon *weapon )
 	AddIconToHistory( HISTSLOT_WEAP, iId, weapon, 0, NULL );
 }
 
+
 //-----------------------------------------------------------------------------
 // Purpose: Add a new entry to the pickup history
 //-----------------------------------------------------------------------------
@@ -116,16 +122,6 @@ void CHudHistoryResource::AddToHistory( int iType, int iId, int iCount )
 	{
 		if ( !iCount )
 			return;
-
-#if defined( CSTRIKE_DLL )
-		// don't leave blank gaps for ammo we're not going to display
-		const FileWeaponInfo_t *pWpnInfo = gWR.GetWeaponFromAmmo( iId );
-		if ( pWpnInfo && ( pWpnInfo->iMaxClip1 >= 0 || pWpnInfo->iMaxClip2 >= 0 ) )
-		{
-			if ( !pWpnInfo->iconSmall )
-				return;
-		}
-#endif
 
 		// clear out any ammo pickup denied icons, since we can obviously pickup again
 		for ( int i = 0; i < m_PickupHistory.Count(); i++ )
@@ -168,7 +164,7 @@ void CHudHistoryResource::AddIconToHistory( int iType, int iId, C_BaseCombatWeap
 	m_bNeedsDraw = true;
 
 	// Check to see if the pic would have to be drawn too high. If so, start again from the bottom
-	if ( (m_flHistoryGap * (m_iCurrentHistorySlot+1)) > GetTall() )
+	if ( (m_flHistoryGap * m_iCurrentHistorySlot) > GetTall() )
 	{
 		m_iCurrentHistorySlot = 0;
 	}
@@ -183,7 +179,7 @@ void CHudHistoryResource::AddIconToHistory( int iType, int iId, C_BaseCombatWeap
 	m_PickupHistory.EnsureCount(m_iCurrentHistorySlot + 1);
 
 	// default to just writing to the first slot
-	HIST_ITEM *freeslot = &m_PickupHistory[m_iCurrentHistorySlot];
+	HIST_ITEM *freeslot = &m_PickupHistory[m_iCurrentHistorySlot++];
 
 	if ( iType == HISTSLOT_AMMODENIED && freeslot->DisplayTime )
 	{
@@ -205,8 +201,6 @@ void CHudHistoryResource::AddIconToHistory( int iType, int iId, C_BaseCombatWeap
 	{
 		freeslot->DisplayTime = gpGlobals->curtime + hud_drawhistory_time.GetFloat();
 	}
-
-	++m_iCurrentHistorySlot;
 }
 
 
@@ -280,11 +274,7 @@ void CHudHistoryResource::CheckClearHistory( void )
 //-----------------------------------------------------------------------------
 bool CHudHistoryResource::ShouldDraw( void )
 {
-#ifdef TF_CLIENT_DLL
-	return false;
-#else
 	return ( ( m_iCurrentHistorySlot > 0 || m_bNeedsDraw ) && CHudElement::ShouldDraw() );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -310,7 +300,7 @@ void CHudHistoryResource::Paint( void )
 	{
 		if ( m_PickupHistory[i].type )
 		{
-			m_PickupHistory[i].DisplayTime = MIN( m_PickupHistory[i].DisplayTime, gpGlobals->curtime + hud_drawhistory_time.GetFloat() );
+			m_PickupHistory[i].DisplayTime = min( m_PickupHistory[i].DisplayTime, gpGlobals->curtime + hud_drawhistory_time.GetFloat() );
 			if ( m_PickupHistory[i].DisplayTime <= gpGlobals->curtime )
 			{  
 				// pic drawing time has expired
@@ -322,46 +312,19 @@ void CHudHistoryResource::Paint( void )
 			float elapsed = m_PickupHistory[i].DisplayTime - gpGlobals->curtime;
 			float scale = elapsed * 80;
 			Color clr = gHUD.m_clrNormal;
-			clr[3] = MIN( scale, 255 );
+			clr[3] = min( scale, 255 );
 
 			bool bUseAmmoFullMsg = false;
 
 			// get the icon and number to draw
 			const CHudTexture *itemIcon = NULL;
-			const CHudTexture *itemAmmoIcon = NULL;
 			int iAmount = 0;
-			bool bHalfHeight = true;
 
 			switch ( m_PickupHistory[i].type )
 			{
 			case HISTSLOT_AMMO:
 				{
-					// Get the weapon we belong to
-#ifndef HL2MP
-					const FileWeaponInfo_t *pWpnInfo = gWR.GetWeaponFromAmmo( m_PickupHistory[i].iId );
-					if ( pWpnInfo && ( pWpnInfo->iMaxClip1 >= 0 || pWpnInfo->iMaxClip2 >= 0 ) )
-					{
-						// The weapon will be the main icon, and the ammo the smaller
-						itemIcon = pWpnInfo->iconSmall;
-						itemAmmoIcon = gWR.GetAmmoIconFromWeapon( m_PickupHistory[i].iId );
-					}
-					else
-#endif // HL2MP
-					{
-						itemIcon = gWR.GetAmmoIconFromWeapon( m_PickupHistory[i].iId );
-						itemAmmoIcon = NULL;
-					}
-
-#ifdef CSTRIKE_DLL
-					// show grenades as the weapon icon
-					if ( pWpnInfo && pWpnInfo->iFlags & ITEM_FLAG_EXHAUSTIBLE )	
-					{
-						itemIcon = pWpnInfo->iconActive;
-						itemAmmoIcon = NULL;
-						bHalfHeight = false;
-					}
-#endif
-
+					itemIcon = gWR.GetAmmoIconFromWeapon( m_PickupHistory[i].iId );
 					iAmount = m_PickupHistory[i].iCount;
 				}
 				break;
@@ -372,7 +335,7 @@ void CHudHistoryResource::Paint( void )
 					bUseAmmoFullMsg = true;
 					// display as red
 					clr = gHUD.m_clrCaution;	
-					clr[3] = MIN( scale, 255 );
+					clr[3] = min( scale, 255 );
 				}
 				break;
 
@@ -386,11 +349,10 @@ void CHudHistoryResource::Paint( void )
 					{
 						// if the weapon doesn't have ammo, display it as red
 						clr = gHUD.m_clrCaution;	
-						clr[3] = MIN( scale, 255 );
+						clr[3] = min( scale, 255 );
 					}
 
 					itemIcon = pWeapon->GetSpriteInactive();
-					bHalfHeight = false;
 				}
 				break;
 			case HISTSLOT_ITEM:
@@ -399,7 +361,6 @@ void CHudHistoryResource::Paint( void )
 						continue;
 
 					itemIcon = m_PickupHistory[i].icon;
-					bHalfHeight = false;
 				}
 				break;
 			default:
@@ -420,20 +381,7 @@ void CHudHistoryResource::Paint( void )
 			int ypos = tall - (m_flHistoryGap * (i + 1));
 			int xpos = wide - itemIcon->Width() - m_flIconInset;
 
-#ifndef HL2MP
-			// Adjust for a half-height icon
-			if ( bHalfHeight )
-			{
-				ypos += itemIcon->Height() / 2;
-			}
-#endif // HL2MP
-
 			itemIcon->DrawSelf( xpos, ypos, clr );
-
-			if ( itemAmmoIcon )
-			{
-				itemAmmoIcon->DrawSelf( xpos - ( itemAmmoIcon->Width() * 1.25f ), ypos, clr );
-			}
 
 			if ( iAmount )
 			{

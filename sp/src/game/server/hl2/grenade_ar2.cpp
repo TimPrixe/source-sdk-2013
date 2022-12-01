@@ -35,6 +35,7 @@ extern ConVar    sk_max_smg1_grenade;
 
 ConVar	  sk_smg1_grenade_radius		( "sk_smg1_grenade_radius","0");
 
+ConVar g_CV_DustExplosion("dust_explosion", "1", 0); // temporary dust explosion switch   //0
 ConVar g_CV_SmokeTrail("smoke_trail", "1", 0); // temporary dust explosion switch
 
 BEGIN_DATADESC( CGrenadeAR2 )
@@ -94,7 +95,7 @@ void CGrenadeAR2::Spawn( void )
 	// -------------
 	// Smoke trail.
 	// -------------
-	if( g_CV_SmokeTrail.GetInt() && !IsXbox() )
+	if( g_CV_SmokeTrail.GetInt())
 	{
 		m_hSmokeTrail = SmokeTrail::CreateSmokeTrail();
 		
@@ -201,6 +202,15 @@ void CGrenadeAR2::Detonate(void)
 	{
 		UTIL_Remove(m_hSmokeTrail);
 		m_hSmokeTrail = NULL;
+	}
+
+	// Create a particle explosion.
+	if (g_CV_DustExplosion.GetBool())
+	{
+		if (AR2Explosion *pExplosion = AR2Explosion::CreateAR2Explosion(GetAbsOrigin()))
+		{
+			pExplosion->SetLifetime(10);
+		}
 	}
 
 	CPASFilter filter( GetAbsOrigin() );
