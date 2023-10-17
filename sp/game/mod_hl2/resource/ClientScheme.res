@@ -49,6 +49,14 @@ Scheme
 		"Yellowish"			"255 160 0 255"
 		"Normal"			"255 208 64 255"
 		"Caution"			"255 48 0 255"
+		
+			// VXP: Old HL2 HUD
+	//	"OldFgColor"			"177 150 70 255"
+		"OldFgColor"			"247 192 84 255"
+	//	"OldBrightFg"			"224 188 89 255"
+		"OldBrightFg"			"244 209 144 255"
+		"OldDamagedFg"			"180 0 0 255"
+		"OldBrightDamagedFg"	"BrightDamagedFg"
 
 		// Top-left corner of the "Half-Life 2" on the main screen
 		"Main.Title1.X"			"53"
@@ -403,6 +411,107 @@ Scheme
 				"additive"	"1"
 				"antialias" "1"
 				"custom"	"1"
+			}
+		}
+		Default2
+		{
+			"1"
+			{
+				"name"		"Verdana"
+				"tall"		"9"
+				"weight"	"500"
+				"antialias" "1"
+				"yres"	"1 599"
+				"range"		"0x0000 0x017F" //	Basic Latin, Latin-1 Supplement, Latin Extended-A
+			}
+			"2"
+			{
+				"name"		"Verdana"
+				"tall"		"12"
+				"weight"	"700"
+				"antialias" "1"
+				"yres"	"600 767"
+				"range"		"0x0000 0x017F" //	Basic Latin, Latin-1 Supplement, Latin Extended-A
+			}
+			"3"
+			{
+				"name"		"Verdana"
+				"tall"		"14"
+				"weight"	"700"
+				"antialias" "1"
+				"yres"	"768 1023"
+				"range"		"0x0000 0x017F" //	Basic Latin, Latin-1 Supplement, Latin Extended-A
+			}
+			"4"
+			{
+				"name"		"Verdana"
+				"tall"		"18"
+				"weight"	"1000"
+				"antialias" "1"
+				"yres"	"1024 1199"
+				"range"		"0x0000 0x017F" //	Basic Latin, Latin-1 Supplement, Latin Extended-A
+			}
+			"5"
+			{
+				"name"		"Verdana"
+				"tall"		"23"
+				"weight"	"1000"
+				"antialias" "1"
+				"yres"	"1200 10000"
+				"additive"	"1"
+				"range"		"0x0000 0x017F" //	Basic Latin, Latin-1 Supplement, Latin Extended-A
+			}
+		}
+		HudNumbers2
+		{
+			"1"
+			{
+				"name"		"DIN-Regular"
+			//	"tall"		"28"
+				"tall"		"27"
+				"weight"	"400"
+				"antialias" "1"
+				"additive"	"0"
+				"yres"	"1 599"
+				"range"		"0x0000 0x017F"
+			}
+			"2"
+			{
+				"name"		"DIN-Light"
+			//	"tall"		"28"
+				"tall"		"27"
+				"weight"	"1000"
+				"antialias" "1"
+				"additive"	"1"
+				"range"		"0x0000 0x017F"
+			}
+		}
+		HudNumbersGlow2
+		{
+			"1"
+			{
+				"name"		"DIN-Regular"
+			//	"tall"		"28"
+				"tall"		"27"
+				"weight"	"400"
+				"blur"		"4"
+				"scanlines" "2"
+				"antialias" "1"
+				"additive"	"1"
+				"yres"	"1 599"
+				"range"		"0x0000 0x017F"
+			}
+			"2"
+			{
+				"name"		"DIN-Light"
+			//	"tall"		"28"
+				"tall"		"27"
+				"weight"	"1000"
+				"blur"		"4"
+				"scanlines" "2"
+				"antialias" "1"
+				"additive"	"1"
+				"range"		"0x0000 0x017F"
 			}
 		}
 		HudSelectionNumbers
@@ -794,6 +903,8 @@ Scheme
 	{
 		"1"		"resource/HALFLIFE2.ttf"
 		"2"		"resource/HL2crosshairs.ttf"
+		"3"		"resource/DINLi.ttf"
+		"4"		"resource/DINRg.ttf"
 	}
 
 }

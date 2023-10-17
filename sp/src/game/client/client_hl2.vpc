@@ -112,6 +112,9 @@ $Project "Client (HL2)"
 			$File	"hl2\shieldproxy.cpp"
 			$File	"hl2\vgui_rootpanel_hl2.cpp"
 			$File 	"episodic\c_vort_charge_token.cpp"
+			$File 	"hl2\parsemsg.cpp"
+			$File 	"hl2\parsemsg.h"
+			$File 	"hl2\c_weapon_ar2.cpp"
 		}
 	}
 }
