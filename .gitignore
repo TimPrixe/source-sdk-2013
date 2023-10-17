@@ -19,6 +19,7 @@ ipch
 *.idb
 *.vcxproj
 *.sln
+*.vpc_crc
 
 # OSX/Linux build products
 *.mak
@@ -54,3 +55,5 @@ config.cfg
 # shader files
 *.tmp
 
+# Mod related stuff
+TheReturn/
